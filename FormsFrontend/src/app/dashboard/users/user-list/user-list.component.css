@@ -1,0 +1,47 @@
+h2 {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+div {
+    display: block;
+    width: 50%;
+    margin: auto;
+}
+
+button {
+    background-color: rgb(191, 187, 187);
+    cursor: pointer;
+    font: inherit;
+    align-content: center;
+    border-radius: 1.5rem;
+    padding: 0 0.75rem 0.25rem 0.75rem;
+
+    #plus {
+        display: inline-block;
+        border-radius: 4px;
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    #text {
+        display: inline-block;
+        align-content: center;
+        text-align: center;
+        font-size: 1.25rem;
+    }
+}
+
+button:hover {
+    background-color: gray;
+}
+
+ul {
+    padding: 1rem 10%;
+    list-style-type: none;
+    border: solid;
+    border-width: 1px;
+    border-radius: 8px;
+    border-color: gray;
+}

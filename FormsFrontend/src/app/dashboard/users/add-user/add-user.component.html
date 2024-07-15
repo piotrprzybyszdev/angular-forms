@@ -1,0 +1,37 @@
+<div class="backdrop" (click)="onCancel()"></div>
+<dialog open>
+  <h2>Add User</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <p>
+        <label for="signup-first-name">First Name</label>
+        <input id="signup-first-name" type="text" formControlName="firstName" />
+    </p>
+    <p>
+        <label for="signup-last-name">Last Name</label>
+        <input id="signup-last-name" type="text" formControlName="lastName"/>
+    </p>
+    <p>
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" formControlName="email"/>
+    </p>
+    <p>
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" formControlName="password"/>
+    </p>
+    <p class="form-error">
+        @if (firstNameInvalid) {
+            First Name cannot be empty or longer than 100 characters
+        } @else if (lastNameInvalid) {
+            Last Name cannot be empty or longer than 100 characters
+        } @else if (emailInvalid) {
+            Email has to be a valid email of length between 1 and 100 characters
+        } @else if (passwordInvalid) {
+            Password field cannot be empty or longer than 100 characters
+        }
+    </p>
+    <p class="actions">
+        <button type="button" (click)="onCancel()">Cancel</button>
+        <button type="submit">Add User</button>
+    </p>
+  </form>
+</dialog>

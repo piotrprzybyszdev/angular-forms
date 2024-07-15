@@ -1,0 +1,23 @@
+<form #form="ngForm" (ngSubmit)="form.form.valid && onSubmit()">
+    <fieldset>
+        <p>
+            <label for="signup-first-name">First Name</label>
+            <input id="signup-first-name" type="text" required maxlength="100" [(ngModel)]="firstName" name="firstName" />
+        </p>
+        <p>
+            <label for="signup-last-name">Last Name</label>
+            <input id="signup-last-name" type="text" required maxlength="100" [(ngModel)]="lastName" name="lastName" />
+        </p>
+        <p>
+            <label for="signup-email">Email</label>
+            <input id="signup-email" type="email" required maxlength="100" [(ngModel)]="email" name="email" />
+        </p>
+        <p>
+            <label for="signup-password">Password</label>
+            <input id="signup-password" type="password" required maxlength="100" [(ngModel)]="password" name="password"/>
+        </p>
+        <p class="actions">
+            <button type="submit" >Register</button>
+        </p>
+    </fieldset>
+</form>

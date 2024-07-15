@@ -1,0 +1,49 @@
+<form [formGroup]="form">
+    <div class="row">
+        <label for="task-title">Title</label>
+        <input id="task-title" type="text" formControlName="title" />
+    </div>
+    <div class="row">
+        <label for="task-description">Description</label>
+        <textarea id="task-description" rows="2" formControlName="description"></textarea>
+    </div>
+    <div class="row">
+        <label for="task-due-date">Due Date</label>
+        <input id="task-due-date" type="datetime-local" formControlName="dueDate"/>
+    </div>
+    @if (isEditable()) {
+    <p class="form-error">
+        @if (titleInvalid) {
+            Title cannot be empty or longer than 100 characters
+        } @else if (descriptionInvalid) {
+            Description longer than 1000 characters
+        } @else if (dueDateInvalid) {
+            Due Date cannot be a past date
+        }
+    </p>
+    } @else {
+        <p class="date-info">
+            Created: {{ task().creationDate }}
+            <br>
+            Last Modified: {{ task().modificationDate }}
+        </p>
+    }
+    <p class="actions">
+        @if (isEditable()) {
+            <button (click)="onSave()">
+                <span class="material-symbols-outlined">save</span>
+            </button>
+            <button (click)="onCancel()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        } @else {
+            <button (click)="onEdit()">
+                <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button (click)="onDelete()">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        }
+    </p>
+</form>
+

@@ -1,0 +1,42 @@
+<form [formGroup]="form">
+    <div class="row">
+        <div class="column">
+            <label for="user-firstName">First Name</label>
+            <input type="text" id="user-firstName" formControlName="firstName" />
+        </div>
+        <div class="column">
+            <label for="user-lastName">Last Name</label>
+            <input type="text" id="user-lastName" formControlName="lastName" />
+        </div>
+    </div>
+    <div>
+        <label for="user-email">Email</label>
+        <input type="email" id="user-email" formControlName="email" />
+    </div>
+    <p class="form-error">
+        @if (firstNameInvalid) {
+            First Name cannot be empty or longer than 100 characters
+        } @else if (lastNameInvalid) {
+            Last Name cannot be empty or longer than 100 characters
+        } @else if (emailInvalid) {
+            Email has to be a valid email of length between 1 and 100 characters
+        }
+    </p>
+    <p class="actions">
+        @if (isEditable()) {
+            <button (click)="onSave()">
+                <span class="material-symbols-outlined">save</span>
+            </button>
+            <button (click)="onCancel()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        } @else {
+            <button (click)="onEdit()">
+                <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button (click)="onDelete()">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        }
+    </p>
+</form>

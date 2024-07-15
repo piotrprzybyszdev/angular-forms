@@ -1,0 +1,19 @@
+@if (isAddingTask()) {
+    <app-add-task (close)="onFinishAddTask()" />
+}
+
+<section>
+<h2>Tasks</h2>
+    <div>
+        <button (click)="onStartAddTask()"><span id="plus">+</span><span id="text">Add Task</span></button>
+        <ul>
+            @for (task of tasks(); track task.id) {
+                <li>
+                    <app-task [task]="task"/>
+                </li>
+            } @empty {
+                <p>There are no tasks defined for this user</p>
+            }
+        </ul>
+    </div>
+</section>

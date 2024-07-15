@@ -1,0 +1,31 @@
+<div class="backdrop" (click)="onCancel()"></div>
+<dialog open>
+  <h2>Add Task</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <p>
+        <label for="task-title">Title</label>
+        <input id="task-title" type="text" formControlName="title" />
+    </p>
+    <p>
+        <label for="task-description">Description</label>
+        <textarea id="task-description" rows="5" formControlName="description"></textarea>
+    </p>
+    <p>
+        <label for="task-due-date">Due Date</label>
+        <input id="task-due-date" type="datetime-local" formControlName="dueDate"/>
+    </p>
+    <p class="form-error">
+        @if (titleInvalid) {
+            Title cannot be empty or longer than 100 characters
+        } @else if (descriptionInvalid) {
+            Description longer than 1000 characters
+        } @else if (dueDateInvalid) {
+            Due Date cannot be a past date
+        }
+    </p>
+    <p class="actions">
+        <button type="button" (click)="onCancel()">Cancel</button>
+        <button type="submit">Add Task</button>
+    </p>
+  </form>
+</dialog>

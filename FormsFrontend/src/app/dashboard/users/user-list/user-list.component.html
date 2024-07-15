@@ -1,0 +1,17 @@
+@if (isAddingUser()) {
+    <app-add-user (close)="onFinishAddUser()" />
+}
+
+<section>
+<h2>Users</h2>
+    <div>
+        <button (click)="onStartAddUser()"><span id="plus">+</span><span id="text">Add User</span></button>
+        <ul>
+            @for (user of users(); track user.guid) {
+                <li>
+                    <app-user [user]="user"/>
+                </li>
+            }
+        </ul>
+    </div>
+</section>

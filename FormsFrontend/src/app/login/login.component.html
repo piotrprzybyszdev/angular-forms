@@ -1,0 +1,23 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <fieldset>
+        <p>
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" formControlName="email" />
+        </p>
+        <p>
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" formControlName="password" />
+        </p>
+        <p class="form-error">
+            @if (emailInvalid) {
+                Email has to be a valid email of length between 1 and 100 characters
+            } @else if (passwordInvalid) {
+                Password field cannot be empty or longer than 100 characters
+            }
+        </p>
+        <p class="actions">
+            <a routerLink="/signup">Register</a>
+            <button type="submit">Log in</button>
+        </p>
+    </fieldset>
+</form>
