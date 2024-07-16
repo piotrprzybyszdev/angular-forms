@@ -1,51 +1,62 @@
 ﻿using AutoMapper;
-using FormsBackendCommon.Dtos.Task;
+using FormsBackendBusiness.Exceptions;
+using FormsBackendBusiness.Validation;
 using FormsBackendCommon.Dtos.User;
 using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FormsBackendBusiness.Services;
 
 public class UserService(UserManager<ApplicationUser> userManager,
-    ITaskService taskService, IMapper mapper) : IUserService
+    ITaskService taskService, IMapper mapper, UserCreateValidator userCreateValidator,
+    UserUpdateValidator userUpdateValidator) : IUserService
 {
-    public async Task<object> CreateUserAsync(UserCreate userCreate)
+    public async Task<string> CreateUserAsync(UserCreate userCreate)
     {
+        var validationResult = await userCreateValidator.ValidateAsync(userCreate);
+        if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
+
         var user = mapper.Map<ApplicationUser>(userCreate);
-        return await userManager.CreateAsync(user, userCreate.Password);
+        var result = await userManager.CreateAsync(user, userCreate.Password);
+        if (result.Succeeded == false) throw new ValidationFailedException(result.Errors);
+        return user.Id;
     }
 
     public async Task DeleteUserAsync(string guid)
     {
-        var user = await userManager.FindByIdAsync(guid);
-        if (user == null) return;
-        await taskService.DeleteUserTasksAsync(new UserTasksDelete(guid));
+                var user = await userManager.FindByIdAsync(guid) ??
+            throw new UserNotFoundException(guid);
+        await taskService.DeleteUserTasksAsync(guid);
         await userManager.DeleteAsync(user);
     }
 
-    public async Task<object?> UpdateUserAsync(UserUpdate userUpdate)
+    public async Task UpdateUserAsync(UserUpdate userUpdate)
     {
-        var user = await userManager.FindByIdAsync(userUpdate.Guid);
-        if (user == null) return null;
+        var validationResult = await userUpdateValidator.ValidateAsync(userUpdate);
+        if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
+
+        var user = await userManager.FindByIdAsync(userUpdate.Id) ??
+            throw new UserNotFoundException(userUpdate.Id);
 
         user.UserName = userUpdate.Email;
         user.Email = userUpdate.Email;
         user.FirstName = userUpdate.FirstName;
         user.LastName = userUpdate.LastName;
 
-        return await userManager.UpdateAsync(user);
+        await userManager.UpdateAsync(user);
     }
 
     public async Task<UserGet?> GetUserById(string guid)
     {
-        var user = await userManager.FindByIdAsync(guid);
+        var user = await userManager.FindByIdAsync(guid) ??
+            throw new UserNotFoundException(guid);
         return mapper.Map<UserGet>(user);
     }
 
     public async Task<List<UserGet>> GetUsersAsync()
     {
-        var users = mapper.Map<List<UserGet>>(userManager.Users.ToList());
-        return await Task.FromResult(users);
+        return mapper.Map<List<UserGet>>(await userManager.Users.ToListAsync());
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FormsBackendCommon.Model;
 using FormsBackendInfrastructure;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,6 @@ public static class IdentityConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.Password.RequireNonAlphanumeric = false;
@@ -26,6 +26,19 @@ public static class IdentityConfiguration
         {
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.HttpOnly = true;
+            options.Events = new CookieAuthenticationEvents()
+            {
+                OnRedirectToAccessDenied = context =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                },
+                OnRedirectToLogin = context =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+            };
         });
     }
 }

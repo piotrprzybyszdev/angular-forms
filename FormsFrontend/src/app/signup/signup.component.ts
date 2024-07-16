@@ -28,12 +28,12 @@ export class SignupComponent {
       this.firstName, this.lastName, this.email, this.password
     ).subscribe({
       next: res => {
-        if (res.succeeded) {
-          this.router.navigate(['login']);
-          this.toastrService.success('You have been successfully signed up!', 'Sign up');
-        } else {
-          this.toastrService.error(res.errors[0].description, 'Sign up');
-        }
+        this.router.navigate(['login']);
+        this.toastrService.success('You have been successfully signed up!', 'Sign up');
+      },
+      error: res => {
+        console.log(res.error.validationFailures);
+        this.toastrService.error(res.error.validationFailures[0].Details, 'Sign up');
       }
     });
   }

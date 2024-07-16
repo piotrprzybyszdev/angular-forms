@@ -1,10 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject, signal } from "@angular/core";
-import { RegistrationResponse } from "../../account.service";
+import { ApiException } from "../../account.service";
 import { Observable, map, tap } from "rxjs";
 
 export type User = {
-  guid: string,
+  id: string,
   firstName: string,
   lastName: string,
   email: string,
@@ -25,8 +25,8 @@ export class UserService {
     this.fetchUsers();
   }
 
-  addUser(firstName: string, lastName: string, email: string, password: string): Observable<RegistrationResponse> {
-    return this.httpClient.post<{ result: RegistrationResponse }>(apiRoute + '/create', {
+  addUser(firstName: string, lastName: string, email: string, password: string): Observable<ApiException> {
+    return this.httpClient.post<{ result: ApiException }>(apiRoute + '/create', {
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -43,13 +43,13 @@ export class UserService {
       }));
   }
 
-  updateUser(user: User): Observable<RegistrationResponse> {
-    return this.httpClient.put<RegistrationResponse>(apiRoute + '/update', user, { withCredentials: true })
-      .pipe(tap(res => {
-        if (res.succeeded) {
-          this.fetchUsers();
-        }
-      }));
+  updateUser(user: User): Observable<ApiException> {
+    return this.httpClient.put<ApiException>(apiRoute + '/update', user, { withCredentials: true })
+      .pipe(tap({
+          next: res => {
+            this.fetchUsers();
+          }
+        }));
   }
 
   private fetchUsers(): void {

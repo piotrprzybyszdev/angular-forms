@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FormsBackendBusiness.Exceptions;
+using FormsBackendBusiness.Validation;
 using FormsBackendCommon.Dtos.Task;
 using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
@@ -7,14 +9,19 @@ using Microsoft.AspNetCore.Identity;
 namespace FormsBackendBusiness.Services;
 
 public class TaskService(ITaskRepository taskRepository,
-    UserManager<ApplicationUser> userManager, IMapper mapper) : ITaskService
+    UserManager<ApplicationUser> userManager, IMapper mapper,
+    TaskCreateValidator taskCreateValidator, TaskUpdateValidator taskUpdateValidator)
+    : ITaskService
 {
     public async Task<int> CreateTaskAsync(TaskCreate taskCreate)
     {
-        var task = mapper.Map<TaskModel>(taskCreate);
-        var user = await userManager.FindByIdAsync(taskCreate.UserGuid);
+        var validationResult = await taskCreateValidator.ValidateAsync(taskCreate);
+        if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        if (user == null) return -1;
+        var user = await userManager.FindByIdAsync(taskCreate.UserGuid) ??
+            throw new UserNotFoundException(taskCreate.UserGuid);
+
+        var task = mapper.Map<TaskModel>(taskCreate);
         task.Account = user;
         task.CreationDate = DateTime.Now;
         task.ModificationDate = DateTime.Now;
@@ -26,40 +33,37 @@ public class TaskService(ITaskRepository taskRepository,
 
     public async Task UpdateTaskAsync(TaskUpdate taskUpdate)
     {
-        var task = await taskRepository.GetByIdAsync(taskUpdate.Id);
-        if (task == null) return;
+        var validationResult = await taskUpdateValidator.ValidateAsync(taskUpdate);
+        if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
+
+        var task = await taskRepository.GetByIdAsync(taskUpdate.Id) ??
+            throw new TaskNotFoundException(taskUpdate.Id);
+
         task.Title = taskUpdate.Title;
         task.Description = taskUpdate.Description;
         task.DueDate = taskUpdate.DueDate;
         task.ModificationDate = DateTime.Now;
+
         taskRepository.Update(task);
         await taskRepository.SaveChangesAsync();
     }
 
     public async Task DeleteTaskAsync(int id)
     {
-        var task = await taskRepository.GetByIdAsync(id);
-
-        if (task == null) return;
+        var task = await taskRepository.GetByIdAsync(id) ??
+            throw new TaskNotFoundException(id);
 
         taskRepository.Delete(task);
         await taskRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteUserTasksAsync(UserTasksDelete userTasksDelete)
+    public async Task DeleteUserTasksAsync(string UserGuid)
     {
-        await taskRepository.DeleteByUserIdAsync(userTasksDelete.UserId);
-    }
-
-    public async Task<TaskGet> GetTaskByIdAsync(int id)
-    {
-        var tasks = await taskRepository.GetByIdAsync(id);
-        return mapper.Map<TaskGet>(tasks);
+        await taskRepository.DeleteByUserIdAsync(UserGuid);
     }
 
     public async Task<List<TaskGet>> GetTasksByUserIdAsync(string userId)
     {
-        var tasks = await taskRepository.GetByUserIdAsync(userId);
-        return mapper.Map<List<TaskGet>>(tasks);
+        return mapper.Map<List<TaskGet>>(await taskRepository.GetByUserIdAsync(userId));
     }
 }

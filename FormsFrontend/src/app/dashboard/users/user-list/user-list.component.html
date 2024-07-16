@@ -7,7 +7,7 @@
     <div>
         <button (click)="onStartAddUser()"><span id="plus">+</span><span id="text">Add User</span></button>
         <ul>
-            @for (user of users(); track user.guid) {
+            @for (user of users(); track user.id) {
                 <li>
                     <app-user [user]="user"/>
                 </li>

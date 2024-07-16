@@ -1,4 +1,5 @@
 ﻿using FormsBackendBusiness.Services;
+using FormsBackendBusiness.Validation;
 using FormsBackendCommon.Interface;
 using FormsBackendInfrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,5 +15,11 @@ public static class ServiceConfiguration
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITaskService, TaskService>();
+
+        services.AddScoped<AccountRegisterValidator>();
+        services.AddScoped<UserCreateValidator>();
+        services.AddScoped<UserUpdateValidator>();
+        services.AddScoped<TaskCreateValidator>();
+        services.AddScoped<TaskUpdateValidator>();
     }
 }

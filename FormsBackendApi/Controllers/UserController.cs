@@ -28,7 +28,8 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdate userUpdate)
     {
-        return Ok(await userService.UpdateUserAsync(userUpdate));
+        await userService.UpdateUserAsync(userUpdate);
+        return Ok();
     }
 
     [HttpGet("get/{guid}")]

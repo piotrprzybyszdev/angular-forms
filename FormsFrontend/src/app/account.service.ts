@@ -10,9 +10,10 @@ export type Account = {
     password: string
 };
 
-export type RegistrationResponse = {
-  succeeded: boolean,
-  errors: { description: string }[]
+export type ApiException = {
+  status: number,
+  title: string,
+  validaionFailures: { Title: string, Details: string }[]
 }
 
 const apiRoute = "/api"
@@ -26,8 +27,8 @@ export class AccountService {
 
   loggedInGuid = this.loggedInAccountGuid.asReadonly();
 
-  registerAccount(firstName: string, lastName: string, email: string, password: string): Observable<RegistrationResponse> {
-    return this.httpClient.post<RegistrationResponse>(apiRoute + '/register', {
+  registerAccount(firstName: string, lastName: string, email: string, password: string): Observable<ApiException> {
+    return this.httpClient.post<ApiException>(apiRoute + '/register', {
       firstName: firstName,
       lastName: lastName,
       email: email,

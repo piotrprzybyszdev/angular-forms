@@ -4,8 +4,8 @@ namespace FormsBackendCommon.Interface;
 
 public interface IUserService
 {
-    Task<object> CreateUserAsync(UserCreate userCreate);
-    Task<object?> UpdateUserAsync(UserUpdate userUpdate);
+    Task<string> CreateUserAsync(UserCreate userCreate);
+    Task UpdateUserAsync(UserUpdate userUpdate);
     Task DeleteUserAsync(string guid);
     Task<UserGet?> GetUserById(string guid);
     Task<List<UserGet>> GetUsersAsync();
