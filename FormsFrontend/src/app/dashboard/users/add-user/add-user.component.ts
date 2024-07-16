@@ -90,12 +90,11 @@ export class AddUserComponent {
       enteredFirstName, enteredLastName, enteredEmail, enteredPassword
     ).subscribe({
       next: res => {
-        if (res.succeeded) {
-          this.close.emit();
-          this.toastrService.success('User was successfully added', 'User added');
-        } else {
-          this.toastrService.error(res.errors[0].description, 'User add');
-        }
+        this.close.emit();
+        this.toastrService.success('User was successfully added', 'User added');
+      },
+      error: res => {
+        this.toastrService.error(res.errors[0].details, 'User add');
       }
     });
   }

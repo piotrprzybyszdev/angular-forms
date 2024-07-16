@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { User, UserService } from '../user.service';
 import { Observable } from 'rxjs';
-import { RegistrationResponse } from '../../../account.service';
+import { ApiException } from '../../../account.service';
 
 @Component({
   selector: 'app-user',
@@ -88,34 +88,31 @@ export class UserComponent implements OnInit {
     }
 
     this.forwardInput().subscribe({
-      next: res => this.handleResponse(res)
+      next: res => {
+        this.toastrService.success('User info was successfully saved', 'User info edit');
+        this.disableEdit();
+      },
+      error: res => {
+        this.toastrService.error(res.errors[0].details, 'User info edit');
+      }
     });
   }
 
   onDelete(): void {
-    this.userService.deleteUser(this.user().guid).subscribe();
+    this.userService.deleteUser(this.user().id).subscribe();
   }
 
-  private forwardInput(): Observable<RegistrationResponse> {
+  private forwardInput(): Observable<ApiException> {
     const enteredFirstName = this.form.value.firstName!;
     const enteredLastName = this.form.value.lastName!;
     const enteredEmail = this.form.value.email!;
 
     return this.userService.updateUser({
-      guid: this.user().guid,
+      id: this.user().id,
       firstName: enteredFirstName,
       lastName: enteredLastName,
       email: enteredEmail,
     });
-  }
-
-  private handleResponse(response: RegistrationResponse): void {
-    if (response.succeeded) {
-      this.toastrService.success('User info was successfully saved', 'User info edit');
-      this.disableEdit();
-    } else {
-      this.toastrService.error(response.errors[0].description, 'User info edit');
-    }
   }
 
   private disableEdit(): void {

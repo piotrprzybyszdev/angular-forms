@@ -11,7 +11,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] AccountRegister accountRegister)
     {
-        return Ok(await accountService.RegisterAsync(accountRegister));
+        await accountService.RegisterAsync(accountRegister);
+        return Ok();
     }
 
     [HttpPost("login")]

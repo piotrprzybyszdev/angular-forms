@@ -1,3 +1,5 @@
+using FluentValidation;
+using FormsBackendApi;
 using FormsBackendBusiness;
 using FormsBackendInfrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+ValidatorOptions.Global.LanguageManager.Enabled = false;
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseRouting();

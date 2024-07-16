@@ -65,11 +65,10 @@ export class LoginComponent {
 
     this.accountService.logIn(enteredEmail, enteredPassword).subscribe({
       next: res => {
-        if (res.guid) {
           this.router.navigate(['dashboard']);
-        } else {
-          this.toastrService.error('Incorrect username or password', 'Login failed');
-        }
+      },
+      error: res => {
+          this.toastrService.error(res.error.title, res.error.detail);
       }
     });
   }
