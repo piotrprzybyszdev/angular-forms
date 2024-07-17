@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FormsBackendBusiness.Exceptions;
 
-public class UserNotFoundException(string id) : ApiException
+public class UserNotFoundException(int id) : ApiException
 {
     public override ProblemDetails GetProblemDetails(HttpContext context)
     {

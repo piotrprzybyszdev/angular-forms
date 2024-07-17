@@ -35,7 +35,7 @@ public class MockTaskRepository : ITaskRepository
         await Task.CompletedTask;
     }
 
-    public async Task DeleteByUserIdAsync(string userId)
+    public async Task DeleteByUserIdAsync(int userId)
     {
         Operations.Add(new TaskRepositoryOperation(TaskRepositoryOperationType.DeleteByUserId, [userId]));
         await Task.CompletedTask;
@@ -53,10 +53,10 @@ public class MockTaskRepository : ITaskRepository
         return await Task.FromResult(Tasks.Find(task => task.Id == id));
     }
 
-    public async Task<List<TaskModel>> GetByUserIdAsync(string userId)
+    public async Task<List<TaskModel>> GetByUserIdAsync(int userId)
     {
         Operations.Add(new TaskRepositoryOperation(TaskRepositoryOperationType.GetByUserId, [userId]));
-        return await Task.FromResult(Tasks.Where(task => task.Account.Id == userId).ToList());
+        return await Task.FromResult(Tasks.Where(task => task.User.Id == userId).ToList());
     }
 
     public async Task SaveChangesAsync()

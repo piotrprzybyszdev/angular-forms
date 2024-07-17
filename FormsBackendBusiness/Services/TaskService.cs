@@ -17,11 +17,11 @@ public class TaskService(ITaskRepository taskRepository,
         var validationResult = await taskCreateValidator.ValidateAsync(taskCreate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var user = await userRepository.GetyByIdAsync(taskCreate.UserGuid) ??
-            throw new UserNotFoundException(taskCreate.UserGuid);
+        var user = await userRepository.GetyByIdAsync(taskCreate.UserId) ??
+            throw new UserNotFoundException(taskCreate.UserId);
 
         var task = mapper.Map<TaskModel>(taskCreate);
-        task.Account = user;
+        task.User = user;
         task.CreationDate = DateTime.Now;
         task.ModificationDate = DateTime.Now;
 
@@ -56,12 +56,12 @@ public class TaskService(ITaskRepository taskRepository,
         await taskRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteUserTasksAsync(string UserGuid)
+    public async Task DeleteUserTasksAsync(int userId)
     {
-        await taskRepository.DeleteByUserIdAsync(UserGuid);
+        await taskRepository.DeleteByUserIdAsync(userId);
     }
 
-    public async Task<List<TaskGet>> GetTasksByUserIdAsync(string userId)
+    public async Task<List<TaskGet>> GetTasksByUserIdAsync(int userId)
     {
         return mapper.Map<List<TaskGet>>(await taskRepository.GetByUserIdAsync(userId));
     }

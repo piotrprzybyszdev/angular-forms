@@ -25,7 +25,7 @@ public class UserServiceTest
         userService.CreateUserAsync(userCreate).Wait();
 
         var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Insert);
-        var applicationUser = (ApplicationUser)operation.Arguments.First();
+        var applicationUser = (UserModel)operation.Arguments.First();
 
         Assert.That(applicationUser.FirstName, Is.EqualTo(userCreate.FirstName));
         Assert.That(applicationUser.LastName, Is.EqualTo(userCreate.LastName));
@@ -39,9 +39,9 @@ public class UserServiceTest
     {
         var userService = CreateUserService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
@@ -59,22 +59,22 @@ public class UserServiceTest
     {
         var userService = CreateUserService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             }
         ];
 
-        var userUpdate = new UserUpdate("testid", "Janusz", "Kowal", "januszkowal@yahoo.de");
+        var userUpdate = new UserUpdate(1, "Janusz", "Kowal", "januszkowal@yahoo.de");
         userService.UpdateUserAsync(userUpdate).Wait();
 
         var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Update);
-        var applicationUser = (ApplicationUser)operation.Arguments.First();
+        var applicationUser = (UserModel)operation.Arguments.First();
 
-        Assert.That(applicationUser.Id, Is.EqualTo("testid"));
+        Assert.That(applicationUser.Id, Is.EqualTo(1));
         Assert.That(applicationUser.FirstName, Is.EqualTo(userUpdate.FirstName));
         Assert.That(applicationUser.LastName, Is.EqualTo(userUpdate.LastName));
         Assert.That(applicationUser.Email, Is.EqualTo(userUpdate.Email));
@@ -87,7 +87,7 @@ public class UserServiceTest
     {
         var userService = CreateUserService();
 
-        var userUpdate = new UserUpdate("testid", "Janusz", "Kowal", "januszkowal@yahoo.de");
+        var userUpdate = new UserUpdate(1, "Janusz", "Kowal", "januszkowal@yahoo.de");
         var task = userService.UpdateUserAsync(userUpdate);
 
         Assert.Throws<AggregateException>(task.Wait);
@@ -99,21 +99,21 @@ public class UserServiceTest
     {
         var userService = CreateUserService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             }
         ];
 
-        userService.DeleteUserAsync("testid").Wait();
+        userService.DeleteUserAsync(1).Wait();
 
         var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Delete);
-        var applicationUser = (ApplicationUser)operation.Arguments.First();
+        var applicationUser = (UserModel)operation.Arguments.First();
 
-        Assert.That(applicationUser.Id, Is.EqualTo("testid"));
+        Assert.That(applicationUser.Id, Is.EqualTo(1));
         Assert.That(taskService.Operations.Count(operation => operation.OperationType == TaskServiceOperationType.DeleteUser), Is.GreaterThan(0));
         Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(UserRepositoryOperationType.SaveChanges));
     }
@@ -122,7 +122,7 @@ public class UserServiceTest
     public void DeleteFailTest()
     {
         var userService = CreateUserService();
-        var task = userService.DeleteUserAsync("testid");
+        var task = userService.DeleteUserAsync(1);
         
         Assert.Throws<AggregateException>(task.Wait);
         Assert.That(task.Exception?.InnerException, Is.InstanceOf<UserNotFoundException>());
@@ -133,26 +133,26 @@ public class UserServiceTest
     {
         var userService = CreateUserService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             }
         ];
 
-        userService.GetUserById("testid").Wait();
+        userService.GetUserById(1).Wait();
 
         var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.GetById);
-        Assert.That((string)operation.Arguments.First(), Is.EqualTo("testid"));
+        Assert.That((int)operation.Arguments.First(), Is.EqualTo(1));
     }
 
     [Test]
     public void GetByIdFailTest()
     {
         var userService = CreateUserService();
-        var task = userService.GetUserById("testid");
+        var task = userService.GetUserById(1);
 
         Assert.Throws<AggregateException>(task.Wait);
         Assert.That(task.Exception?.InnerException, Is.InstanceOf<UserNotFoundException>());
@@ -162,17 +162,17 @@ public class UserServiceTest
     public void GetTest()
     {
         var userService = CreateUserService();
-        List<ApplicationUser> data = [
-            new ApplicationUser()
+        List<UserModel> data = [
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             },
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid2",
+                Id = 2,
                 FirstName = "Adam",
                 LastName = "Nowak",
                 Email = "adamnowak@gmail.com",
@@ -180,7 +180,7 @@ public class UserServiceTest
         ];
 
         foreach (var user in data)
-            userRepository.Users.Add(new ApplicationUser()
+            userRepository.Users.Add(new UserModel()
             {
                 Id = user.Id,
                 FirstName = user.FirstName,

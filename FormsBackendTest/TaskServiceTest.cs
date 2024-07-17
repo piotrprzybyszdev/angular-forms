@@ -5,9 +5,7 @@ using FormsBackendBusiness.Exceptions;
 using FormsBackendBusiness.Services;
 using FormsBackendBusiness.Validation;
 using FormsBackendCommon.Dtos.Task;
-using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
-using System.Threading.Tasks.Sources;
 
 namespace FormBackendTest;
 
@@ -34,16 +32,16 @@ public class TaskServiceTest
     {
         var taskService = CreateTaskService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             }
         ];
 
-        var taskCreate = new TaskCreate("testid", "testing", "testing creation method", DateTime.Now.AddDays(1));
+        var taskCreate = new TaskCreate(1, "testing", "testing creation method", DateTime.Now.AddDays(1));
 
         taskService.CreateTaskAsync(taskCreate).Wait();
 
@@ -53,7 +51,7 @@ public class TaskServiceTest
         Assert.That(taskModel.Title, Is.EqualTo(taskCreate.Title));
         Assert.That(taskModel.Description, Is.EqualTo(taskCreate.Description));
         Assert.That(taskModel.DueDate, Is.EqualTo(taskCreate.DueDate));
-        Assert.That(taskModel.Account.Id, Is.EqualTo("testid"));
+        Assert.That(taskModel.User.Id, Is.EqualTo(1));
         Assert.That(taskModel.CreationDate, Is.LessThan(DateTime.Now));
         Assert.That(taskModel.CreationDate, Is.GreaterThan(DateTime.Now.AddMinutes(-1)));
         Assert.That(taskModel.ModificationDate, Is.LessThan(taskModel.CreationDate.AddMilliseconds(100)));
@@ -67,7 +65,7 @@ public class TaskServiceTest
     public void CreateFailTest()
     {
         var taskService = CreateTaskService();
-        var taskCreate = new TaskCreate("testid", "testing", "testing creation method", DateTime.Now.AddDays(1));
+        var taskCreate = new TaskCreate(1, "testing", "testing creation method", DateTime.Now.AddDays(1));
 
         var task = taskService.CreateTaskAsync(taskCreate);
         Assert.Throws<AggregateException>(task.Wait);
@@ -79,9 +77,9 @@ public class TaskServiceTest
     {
         var taskService = CreateTaskService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
@@ -92,7 +90,7 @@ public class TaskServiceTest
             new TaskModel()
             {
                 Id = 1,
-                Account = userRepository.Users[0],
+                User = userRepository.Users[0],
                 Title = "testing",
                 Description = "testing update method",
                 DueDate = dt.AddDays(1),
@@ -109,7 +107,7 @@ public class TaskServiceTest
         var taskModel = (TaskModel)operation.Arguments.First();
 
         Assert.That(taskModel.Id, Is.EqualTo(1));
-        Assert.That(taskModel.Account.Id, Is.EqualTo("testid"));
+        Assert.That(taskModel.User.Id, Is.EqualTo(1));
         Assert.That(taskModel.Title, Is.EqualTo("testing"));
         Assert.That(taskModel.Description, Is.EqualTo("done testing update method"));
         Assert.That(taskModel.DueDate, Is.EqualTo(dt2));
@@ -137,9 +135,9 @@ public class TaskServiceTest
     {
         var taskService = CreateTaskService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
@@ -150,7 +148,7 @@ public class TaskServiceTest
             new TaskModel()
             {
                 Id = 1,
-                Account = userRepository.Users[0],
+                User = userRepository.Users[0],
                 Title = "testing",
                 Description = "testing update method",
                 DueDate = dt.AddDays(1),
@@ -187,16 +185,16 @@ public class TaskServiceTest
 
         var taskService = CreateTaskService();
         userRepository.Users = [
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid",
+                Id = 1,
                 FirstName = "Jan",
                 LastName = "Kowalski",
                 Email = "jankowalski@gmail.com",
             },
-            new ApplicationUser()
+            new UserModel()
             {
-                Id = "testid2",
+                Id = 2,
                 FirstName = "Adam",
                 LastName = "Nowak",
                 Email = "adamnowak@gmail.com",
@@ -206,7 +204,7 @@ public class TaskServiceTest
             new TaskModel()
             {
                 Id = 1,
-                Account = userRepository.Users[0],
+                User = userRepository.Users[0],
                 Title = "testing",
                 Description = "testing get",
                 DueDate = dt2,
@@ -216,7 +214,7 @@ public class TaskServiceTest
             new TaskModel()
             {
                 Id = 2,
-                Account = userRepository.Users[1],
+                User = userRepository.Users[1],
                 Title = "testing",
                 Description = "testing get 2",
                 DueDate = dt2,
@@ -225,7 +223,7 @@ public class TaskServiceTest
             }
         ];
 
-        var task = taskService.GetTasksByUserIdAsync("testid");
+        var task = taskService.GetTasksByUserIdAsync(1);
         task.Wait();
         var tasks = task.Result;
         

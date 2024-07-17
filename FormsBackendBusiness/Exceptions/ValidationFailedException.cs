@@ -1,6 +1,5 @@
 ﻿using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FormsBackendBusiness.Exceptions;
@@ -14,11 +13,6 @@ public class ValidationFailedException : ApiException
     public ValidationFailedException(IEnumerable<ValidationError> errors)
     {
         this.errors = errors;
-    }
-
-    public ValidationFailedException(IEnumerable<IdentityError> errors)
-    {
-        this.errors = errors.Select(error => new ValidationError(error.Code, error.Description));
     }
 
     public ValidationFailedException(IEnumerable<ValidationFailure> errors)

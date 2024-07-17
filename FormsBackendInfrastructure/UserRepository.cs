@@ -1,51 +1,48 @@
 ﻿using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace FormsBackendInfrastructure;
 
-public class UserRepository(UserManager<ApplicationUser> userManager) : IUserRepository
+public class UserRepository(ApplicationDbContext context) : IUserRepository
 {
-    public async Task<string> InsertAsync(ApplicationUser user)
+    readonly DbSet<UserModel> set = context.Set<UserModel>();
+
+    public async Task<int> InsertAsync(UserModel user)
     {
-        await userManager.CreateAsync(user);
+        await set.AddAsync(user);
         return user.Id;
     }
 
-    public async Task UpdateAsync(ApplicationUser user)
+    public async Task UpdateAsync(UserModel user)
     {
-        var model = await userManager.FindByIdAsync(user.Id)
-            ?? throw new Exception("user info wasn't validated");
-
-        model.UserName = user.UserName;
-        model.Email = user.Email;
-        model.FirstName = user.FirstName;
-        model.LastName = user.LastName;
-
-        await userManager.UpdateAsync(model);
+        set.Attach(user);
+        context.Entry(user).State = EntityState.Modified;
+        await Task.CompletedTask;
     }
 
-    public async Task<List<ApplicationUser>> GetAsync()
+    public async Task<List<UserModel>> GetAsync()
     {
-        return await userManager.Users.ToListAsync();
+        return await set.ToListAsync();
     }
 
-    public async Task<ApplicationUser?> GetyByIdAsync(string id)
+    public async Task<UserModel?> GetyByIdAsync(int id)
     {
-        return await userManager.FindByIdAsync(id);
+        return await set.Where((UserModel user) => user.Id == id)
+            .SingleOrDefaultAsync();
     }
 
-    public async Task DeleteAsync(ApplicationUser user)
+    public async Task DeleteAsync(UserModel user)
     {
-        var model = await userManager.FindByIdAsync(user.Id)
-            ?? throw new Exception("user info wasn't validated");
-        
-        await userManager.DeleteAsync(model);
+        if (context.Entry(user).State == EntityState.Detached)
+            set.Attach(user);
+        set.Remove(user);
+
+        await Task.CompletedTask;
     }
 
-    public Task SaveChangesAsync()
+    public async Task SaveChangesAsync()
     {
-        return Task.CompletedTask;
+        await context.SaveChangesAsync();
     }
 }

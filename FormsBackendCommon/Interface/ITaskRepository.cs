@@ -8,8 +8,8 @@ public interface ITaskRepository
     Task Update(TaskModel task);
     Task<List<TaskModel>> GetAsync();
     Task<TaskModel?> GetByIdAsync(int id);
-    Task<List<TaskModel>> GetByUserIdAsync(string userId);
+    Task<List<TaskModel>> GetByUserIdAsync(int userId);
     Task Delete(TaskModel task);
-    Task DeleteByUserIdAsync(string userId);
+    Task DeleteByUserIdAsync(int userId);
     Task SaveChangesAsync();
 }

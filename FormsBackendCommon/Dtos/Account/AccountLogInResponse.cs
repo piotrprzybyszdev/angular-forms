@@ -1,3 +1,3 @@
 ﻿namespace FormsBackendCommon.Dtos.Account;
 
-public record AccountLogInResponse(string? Guid);
+public record AccountLogInResponse(int? Id);

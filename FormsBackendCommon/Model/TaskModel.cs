@@ -9,5 +9,5 @@ public class TaskModel : BaseEntity
     public DateTime CreationDate { get; set; }
     public DateTime ModificationDate { get; set; }
     public DateTime DueDate { get; set; }
-    public ApplicationUser Account { get; set; } = default!;
+    public UserModel User { get; set; } = default!;
 }

@@ -1,11 +1,11 @@
 ﻿using FormsBackendCommon.Model;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FormsBackendInfrastructure;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : DbContext
 {
+    public DbSet<UserModel> Users { get; set; }
     public DbSet<TaskModel> Tasks { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -22,7 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         builder.Entity<TaskModel>().HasKey(e => e.Id);
 
-        builder.Entity<TaskModel>().HasOne(e => e.Account);
+        builder.Entity<TaskModel>().HasOne(e => e.User);
 
         base.OnModelCreating(builder);
     }

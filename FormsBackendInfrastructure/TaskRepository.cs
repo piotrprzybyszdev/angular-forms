@@ -32,9 +32,9 @@ public class TaskRepository(ApplicationDbContext context) : ITaskRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<List<TaskModel>> GetByUserIdAsync(string userId)
+    public async Task<List<TaskModel>> GetByUserIdAsync(int userId)
     {
-        return await set.Where((TaskModel task) => task.Account.Id == userId)
+        return await set.Where((TaskModel task) => task.User.Id == userId)
             .ToListAsync();
     }
 
@@ -46,9 +46,9 @@ public class TaskRepository(ApplicationDbContext context) : ITaskRepository
         await Task.CompletedTask;
     }
 
-    public async Task DeleteByUserIdAsync(string userId)
+    public async Task DeleteByUserIdAsync(int userId)
     {
-        await set.Where((TaskModel task) => task.Account.Id == userId)
+        await set.Where((TaskModel task) => task.User.Id == userId)
             .ForEachAsync(task => 
             {
                 if (context.Entry(task).State == EntityState.Detached)

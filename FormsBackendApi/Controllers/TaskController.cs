@@ -30,9 +30,9 @@ public class TaskController(ITaskService taskService) : ControllerBase
         return Ok();
     }
 
-    [HttpGet("get/{guid}")]
-    public async Task<IActionResult> GetUserTasksAsync(string guid)
+    [HttpGet("get/{id}")]
+    public async Task<IActionResult> GetUserTasksAsync(int id)
     {
-        return Ok(await taskService.GetTasksByUserIdAsync(guid));
+        return Ok(await taskService.GetTasksByUserIdAsync(id));
     }
 }

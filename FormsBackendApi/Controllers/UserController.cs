@@ -18,10 +18,10 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok(await userService.CreateUserAsync(userCreate));
     }
 
-    [HttpDelete("delete/{guid}")]
-    public async Task<IActionResult> DeleteUserAsync(string guid)
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> DeleteUserAsync(int id)
     {
-        await userService.DeleteUserAsync(guid);
+        await userService.DeleteUserAsync(id);
         return Ok();
     }
 
@@ -32,10 +32,10 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok();
     }
 
-    [HttpGet("get/{guid}")]
-    public async Task<IActionResult> GetUserAsync(string guid)
+    [HttpGet("get/{id}")]
+    public async Task<IActionResult> GetUserAsync(int id)
     {
-        return Ok(await userService.GetUserById(guid));
+        return Ok(await userService.GetUserById(id));
     }
 
     [HttpGet("get")]

@@ -32,13 +32,13 @@ public class MockTaskService : ITaskService
         return Task.CompletedTask;
     }
 
-    public Task DeleteUserTasksAsync(string userId)
+    public Task DeleteUserTasksAsync(int userId)
     {
         Operations.Add(new TaskServiceOperation(TaskServiceOperationType.DeleteUser, [userId]));
         return Task.CompletedTask;
     }
 
-    public Task<List<TaskGet>> GetTasksByUserIdAsync(string userId)
+    public Task<List<TaskGet>> GetTasksByUserIdAsync(int userId)
     {
         Operations.Add(new TaskServiceOperation(TaskServiceOperationType.GetByUser, [userId]));
         return Task.FromResult<List<TaskGet>>([]);

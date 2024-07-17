@@ -1,3 +1,3 @@
 ﻿namespace FormsBackendCommon.Dtos.User;
 
-public record UserUpdate(string Id, string FirstName, string LastName, string Email);
+public record UserUpdate(int Id, string FirstName, string LastName, string Email);

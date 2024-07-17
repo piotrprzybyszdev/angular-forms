@@ -17,14 +17,11 @@ public class DtoEntityMapperProfile : Profile
     {
         return new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<AccountRegister, ApplicationUser>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
-            cfg.CreateMap<UserCreate, ApplicationUser>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+            cfg.CreateMap<AccountRegister, UserModel>();
+            cfg.CreateMap<UserCreate, UserModel>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            cfg.CreateMap<UserUpdate, ApplicationUser>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
-            cfg.CreateMap<ApplicationUser, UserGet>();
+            cfg.CreateMap<UserUpdate, UserModel>();
+            cfg.CreateMap<UserModel, UserGet>();
             cfg.CreateMap<TaskCreate, TaskModel>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             cfg.CreateMap<TaskUpdate, TaskModel>();

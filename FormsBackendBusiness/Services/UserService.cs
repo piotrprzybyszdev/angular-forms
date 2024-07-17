@@ -11,7 +11,7 @@ public class UserService(IUserRepository userRepository,
     ITaskService taskService, IMapper mapper, UserCreateValidator userCreateValidator,
     UserUpdateValidator userUpdateValidator) : IUserService
 {
-    public async Task<string> CreateUserAsync(UserCreate userCreate)
+    public async Task<int> CreateUserAsync(UserCreate userCreate)
     {
         var validationResult = await userCreateValidator.ValidateAsync(userCreate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
@@ -19,13 +19,17 @@ public class UserService(IUserRepository userRepository,
         if ((await userRepository.GetAsync()).Any(user => user.Email == userCreate.Email))
             throw new ValidationFailedException([new ValidationError("Email validation failed", "User with this email already exists")]);
 
-        var user = mapper.Map<ApplicationUser>(userCreate);
+        var user = mapper.Map<UserModel>(userCreate);
+
+        user.PasswordSalt = BCrypt.Net.BCrypt.GenerateSalt();
+        user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(userCreate.Password, user.PasswordSalt);
+
         var id = await userRepository.InsertAsync(user);
         await userRepository.SaveChangesAsync();
         return id;
     }
 
-    public async Task DeleteUserAsync(string id)
+    public async Task DeleteUserAsync(int id)
     {
         var user = await userRepository.GetyByIdAsync(id) ??
             throw new UserNotFoundException(id);
@@ -42,7 +46,6 @@ public class UserService(IUserRepository userRepository,
         var user = await userRepository.GetyByIdAsync(userUpdate.Id) ??
             throw new UserNotFoundException(userUpdate.Id);
 
-        user.UserName = userUpdate.Email;
         user.Email = userUpdate.Email;
         user.FirstName = userUpdate.FirstName;
         user.LastName = userUpdate.LastName;
@@ -51,7 +54,7 @@ public class UserService(IUserRepository userRepository,
         await userRepository.SaveChangesAsync();
     }
 
-    public async Task<UserGet?> GetUserById(string id)
+    public async Task<UserGet?> GetUserById(int id)
     {
         var user = await userRepository.GetyByIdAsync(id) ??
             throw new UserNotFoundException(id);

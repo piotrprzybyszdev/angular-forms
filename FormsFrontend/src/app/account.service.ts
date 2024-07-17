@@ -2,13 +2,6 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { Observable, tap } from "rxjs";
 
-export type Account = {
-    guid: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-};
 
 export type ApiException = {
   status: number,
@@ -23,9 +16,9 @@ const apiRoute = "/api"
 })
 export class AccountService {
   private httpClient = inject(HttpClient);
-  private loggedInAccountGuid = signal<string | undefined>(undefined);
+  private loggedInAccountId = signal<number | undefined>(undefined);
 
-  loggedInGuid = this.loggedInAccountGuid.asReadonly();
+  loggedInGuid = this.loggedInAccountId.asReadonly();
 
   registerAccount(firstName: string, lastName: string, email: string, password: string): Observable<ApiException> {
     return this.httpClient.post<ApiException>(apiRoute + '/register', {
@@ -36,18 +29,18 @@ export class AccountService {
     });
   }
 
-  logIn(email: string, password: string): Observable<{ guid?: string }> {
-    return this.httpClient.post<{guid?: string}>(apiRoute + '/login', {
+  logIn(email: string, password: string): Observable<{ id?: number }> {
+    return this.httpClient.post<{id?: number}>(apiRoute + '/login', {
       email: email,
       password: password
     }).pipe(tap({
-      next: res => this.loggedInAccountGuid.set(res.guid)
+      next: res => this.loggedInAccountId.set(res.id)
     }));
   }
 
   logOut(): Observable<Object> {
     return this.httpClient.post(apiRoute + '/logout', {
-      next: () => this.loggedInAccountGuid.set(undefined)
+      next: () => this.loggedInAccountId.set(undefined)
     });
   }
 }

@@ -1,3 +1,3 @@
 ﻿namespace FormsBackendCommon.Dtos.Task;
 
-public record TaskCreate(string UserGuid, string Title, string Description, DateTime DueDate);
+public record TaskCreate(int UserId, string Title, string Description, DateTime DueDate);
