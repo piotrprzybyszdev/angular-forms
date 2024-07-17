@@ -10,6 +10,7 @@ public static class ServiceConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
 
         services.AddScoped<IAccountService, AccountService>();

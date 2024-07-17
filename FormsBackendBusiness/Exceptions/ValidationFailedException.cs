@@ -11,6 +11,11 @@ public class ValidationFailedException : ApiException
 {
     readonly IEnumerable<ValidationError> errors;
 
+    public ValidationFailedException(IEnumerable<ValidationError> errors)
+    {
+        this.errors = errors;
+    }
+
     public ValidationFailedException(IEnumerable<IdentityError> errors)
     {
         this.errors = errors.Select(error => new ValidationError(error.Code, error.Description));

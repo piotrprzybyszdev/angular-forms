@@ -4,12 +4,11 @@ using FormsBackendBusiness.Validation;
 using FormsBackendCommon.Dtos.Task;
 using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
-using Microsoft.AspNetCore.Identity;
 
 namespace FormsBackendBusiness.Services;
 
 public class TaskService(ITaskRepository taskRepository,
-    UserManager<ApplicationUser> userManager, IMapper mapper,
+    IUserRepository userRepository, IMapper mapper,
     TaskCreateValidator taskCreateValidator, TaskUpdateValidator taskUpdateValidator)
     : ITaskService
 {
@@ -18,7 +17,7 @@ public class TaskService(ITaskRepository taskRepository,
         var validationResult = await taskCreateValidator.ValidateAsync(taskCreate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var user = await userManager.FindByIdAsync(taskCreate.UserGuid) ??
+        var user = await userRepository.GetyByIdAsync(taskCreate.UserGuid) ??
             throw new UserNotFoundException(taskCreate.UserGuid);
 
         var task = mapper.Map<TaskModel>(taskCreate);
@@ -44,7 +43,7 @@ public class TaskService(ITaskRepository taskRepository,
         task.DueDate = taskUpdate.DueDate;
         task.ModificationDate = DateTime.Now;
 
-        taskRepository.Update(task);
+        await taskRepository.Update(task);
         await taskRepository.SaveChangesAsync();
     }
 
@@ -53,7 +52,7 @@ public class TaskService(ITaskRepository taskRepository,
         var task = await taskRepository.GetByIdAsync(id) ??
             throw new TaskNotFoundException(id);
 
-        taskRepository.Delete(task);
+        await taskRepository.Delete(task);
         await taskRepository.SaveChangesAsync();
     }
 
