@@ -10,17 +10,25 @@ public class DtoEntityMapperProfile : Profile
 {
     public DtoEntityMapperProfile()
     {
-        CreateMap<AccountRegister, ApplicationUser>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
-        CreateMap<UserCreate, ApplicationUser>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
-        CreateMap<UserUpdate, ApplicationUser>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
-        CreateMap<ApplicationUser, UserGet>();
-        CreateMap<TaskCreate, TaskModel>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
-        CreateMap<TaskUpdate, TaskModel>();
-        CreateMap<TaskModel, TaskGet>();
+        GetConfiguration().CompileMappings();
+    }
+
+    public static MapperConfiguration GetConfiguration()
+    {
+        return new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<AccountRegister, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+            cfg.CreateMap<UserCreate, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+            cfg.CreateMap<UserUpdate, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+            cfg.CreateMap<ApplicationUser, UserGet>();
+            cfg.CreateMap<TaskCreate, TaskModel>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+            cfg.CreateMap<TaskUpdate, TaskModel>();
+            cfg.CreateMap<TaskModel, TaskGet>(); 
+        });
     }
 }

@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite("FileName=forms.db", b => b.MigrationsAssembly("FormsBackendApi")));
 
-builder.Services.AddAutoMapper(typeof(DtoEntityMapperProfile));
+builder.Services.AddSingleton(DtoEntityMapperProfile.GetConfiguration().CreateMapper());
 IdentityConfiguration.Configure(builder.Services);
 ServiceConfiguration.Configure(builder.Services);
 

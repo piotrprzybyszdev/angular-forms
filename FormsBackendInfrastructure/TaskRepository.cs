@@ -14,10 +14,11 @@ public class TaskRepository(ApplicationDbContext context) : ITaskRepository
         return task.Id;
     }
 
-    public void Update(TaskModel task)
+    public async Task Update(TaskModel task)
     {
         set.Attach(task);
         context.Entry(task).State = EntityState.Modified;
+        await Task.CompletedTask;
     }
 
     public async Task<List<TaskModel>> GetAsync()
@@ -37,17 +38,23 @@ public class TaskRepository(ApplicationDbContext context) : ITaskRepository
             .ToListAsync();
     }
 
-    public void Delete(TaskModel task)
+    public async Task Delete(TaskModel task)
     {
         if (context.Entry(task).State == EntityState.Detached)
             set.Attach(task);
         set.Remove(task);
+        await Task.CompletedTask;
     }
 
     public async Task DeleteByUserIdAsync(string userId)
     {
         await set.Where((TaskModel task) => task.Account.Id == userId)
-            .ForEachAsync(Delete);
+            .ForEachAsync(task => 
+            {
+                if (context.Entry(task).State == EntityState.Detached)
+                    set.Attach(task);
+                set.Remove(task);
+            });
     }
 
     public async Task SaveChangesAsync()

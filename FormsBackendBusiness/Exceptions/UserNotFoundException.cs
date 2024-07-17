@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FormsBackendBusiness.Exceptions;
 
-public class UserNotFoundException(string guid) : ApiException
+public class UserNotFoundException(string id) : ApiException
 {
     public override ProblemDetails GetProblemDetails(HttpContext context)
     {
@@ -13,7 +13,7 @@ public class UserNotFoundException(string guid) : ApiException
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "User not found",
-            Detail = $"User with guid: '{guid}' not found"
+            Detail = $"User with guid: '{id}' not found"
         };
     }
 }
