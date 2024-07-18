@@ -107,7 +107,7 @@ export class TaskComponent implements OnInit {
 
     return this.taskService.updateTask({
       id: this.task().id,
-      userGuid: this.task().userGuid,
+      userId: this.task().userId,
       title: enteredTitle,
       description: enteredDescription,
       creationDate: this.task().creationDate,

@@ -5,7 +5,7 @@ import { Observable, tap } from "rxjs";
 
 export type Task = {
   id: number,
-  userGuid: string,
+  userId: number,
   title: string,
   description: string,
   creationDate: string,
@@ -31,7 +31,7 @@ export class TaskService {
 
   addTask(title: string, description: string, dueDate: string): Observable<number> {
     return this.httpClient.post<number>(apiRoute + '/create', {
-      userGuid: this.accountService.loggedInGuid(),
+      userId: this.accountService.loggedInId(),
       title: title,
       description: description,
       dueDate: dueDate
@@ -55,7 +55,7 @@ export class TaskService {
   }
 
   private fetchTasks(): void {
-    this.httpClient.get<Task[]>(apiRoute + `/get/${this.accountService.loggedInGuid()}`)
+    this.httpClient.get<Task[]>(apiRoute + `/get/${this.accountService.loggedInId()}`)
       .subscribe({
         next: res => {
           this._tasks.set(res);

@@ -1,6 +1,4 @@
-﻿using DemoProjectCommon.Model;
-
-namespace FormsBackendCommon.Model;
+﻿namespace FormsBackendCommon.Model;
 
 public class TaskModel : BaseEntity
 {

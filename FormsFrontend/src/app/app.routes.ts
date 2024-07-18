@@ -11,7 +11,7 @@ const canAccessDashboard: CanMatchFn = (route, segments) => {
     const router = inject(Router);
     const accountService = inject(AccountService);
 
-    if (accountService.loggedInGuid()) {
+    if (accountService.loggedInId()) {
         return true;
     }
     return new RedirectCommand(router.parseUrl('/unauthorized'));

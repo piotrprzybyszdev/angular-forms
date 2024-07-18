@@ -7,8 +7,8 @@ using FormsBackendCommon.Model;
 
 namespace FormsBackendBusiness.Services;
 
-public class TaskService(ITaskRepository taskRepository,
-    IUserRepository userRepository, IMapper mapper,
+public class TaskService(IGenericRepository<TaskModel> taskRepository,
+    IGenericRepository<UserModel> userRepository, IMapper mapper,
     TaskCreateValidator taskCreateValidator, TaskUpdateValidator taskUpdateValidator)
     : ITaskService
 {
@@ -17,7 +17,7 @@ public class TaskService(ITaskRepository taskRepository,
         var validationResult = await taskCreateValidator.ValidateAsync(taskCreate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var user = await userRepository.GetyByIdAsync(taskCreate.UserId) ??
+        var user = await userRepository.GetByIdAsync(taskCreate.UserId) ??
             throw new UserNotFoundException(taskCreate.UserId);
 
         var task = mapper.Map<TaskModel>(taskCreate);
@@ -43,7 +43,7 @@ public class TaskService(ITaskRepository taskRepository,
         task.DueDate = taskUpdate.DueDate;
         task.ModificationDate = DateTime.Now;
 
-        await taskRepository.Update(task);
+        await taskRepository.UpdateAsync(task);
         await taskRepository.SaveChangesAsync();
     }
 
@@ -52,17 +52,24 @@ public class TaskService(ITaskRepository taskRepository,
         var task = await taskRepository.GetByIdAsync(id) ??
             throw new TaskNotFoundException(id);
 
-        await taskRepository.Delete(task);
+        await taskRepository.DeleteAsync(task);
         await taskRepository.SaveChangesAsync();
     }
 
     public async Task DeleteUserTasksAsync(int userId)
     {
-        await taskRepository.DeleteByUserIdAsync(userId);
+        var tasks = await taskRepository.GetFilteredAsync(
+            [task => task.User.Id == userId]
+        );
+
+        foreach (var task in tasks)
+            await taskRepository.DeleteAsync(task);
     }
 
     public async Task<List<TaskGet>> GetTasksByUserIdAsync(int userId)
     {
-        return mapper.Map<List<TaskGet>>(await taskRepository.GetByUserIdAsync(userId));
+        return mapper.Map<List<TaskGet>>(await taskRepository.GetFilteredAsync(
+            [task => task.User.Id == userId]
+        ));
     }
 }

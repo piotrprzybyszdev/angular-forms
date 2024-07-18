@@ -1,4 +1,4 @@
-﻿namespace DemoProjectCommon.Model;
+﻿namespace FormsBackendCommon.Model;
 
 public class BaseEntity
 {

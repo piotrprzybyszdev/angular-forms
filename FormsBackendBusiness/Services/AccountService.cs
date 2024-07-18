@@ -7,7 +7,7 @@ using FormsBackendCommon.Model;
 
 namespace FormsBackendBusiness.Services;
 
-public class AccountService(IUserRepository userRepository, IMapper mapper,
+public class AccountService(IGenericRepository<UserModel> userRepository, IMapper mapper,
     AccountRegisterValidator accountRegisterValidator) : IAccountService
 {
     public async Task RegisterAsync(AccountRegister accountRegister)

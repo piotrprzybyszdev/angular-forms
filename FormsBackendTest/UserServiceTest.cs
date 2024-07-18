@@ -13,7 +13,7 @@ namespace FormBackendTest;
 public class UserServiceTest
 {
     readonly Mapper mapper = (Mapper)DtoEntityMapperProfile.GetConfiguration().CreateMapper();
-    MockUserRepository userRepository = new();
+    MockGenericRepository<UserModel> userRepository = new();
     MockTaskService taskService = new();
 
     [Test]
@@ -24,21 +24,21 @@ public class UserServiceTest
         var userCreate = new UserCreate("Jan", "Kowalski", "jankowalski@gmail.com", "test123");
         userService.CreateUserAsync(userCreate).Wait();
 
-        var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Insert);
+        var operation = userRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Insert);
         var applicationUser = (UserModel)operation.Arguments.First();
 
         Assert.That(applicationUser.FirstName, Is.EqualTo(userCreate.FirstName));
         Assert.That(applicationUser.LastName, Is.EqualTo(userCreate.LastName));
         Assert.That(applicationUser.Email, Is.EqualTo(userCreate.Email));
 
-        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(UserRepositoryOperationType.SaveChanges));
+        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
     }
 
     [Test]
     public void CreateFailTest()
     {
         var userService = CreateUserService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -58,7 +58,7 @@ public class UserServiceTest
     public void UpdateSuccessTest()
     {
         var userService = CreateUserService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -71,7 +71,7 @@ public class UserServiceTest
         var userUpdate = new UserUpdate(1, "Janusz", "Kowal", "januszkowal@yahoo.de");
         userService.UpdateUserAsync(userUpdate).Wait();
 
-        var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Update);
+        var operation = userRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Update);
         var applicationUser = (UserModel)operation.Arguments.First();
 
         Assert.That(applicationUser.Id, Is.EqualTo(1));
@@ -79,7 +79,7 @@ public class UserServiceTest
         Assert.That(applicationUser.LastName, Is.EqualTo(userUpdate.LastName));
         Assert.That(applicationUser.Email, Is.EqualTo(userUpdate.Email));
 
-        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(UserRepositoryOperationType.SaveChanges));
+        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
     }
 
     [Test]
@@ -98,7 +98,7 @@ public class UserServiceTest
     public void DeleteSuccessTest()
     {
         var userService = CreateUserService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -110,12 +110,12 @@ public class UserServiceTest
 
         userService.DeleteUserAsync(1).Wait();
 
-        var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.Delete);
+        var operation = userRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Delete);
         var applicationUser = (UserModel)operation.Arguments.First();
 
         Assert.That(applicationUser.Id, Is.EqualTo(1));
         Assert.That(taskService.Operations.Count(operation => operation.OperationType == TaskServiceOperationType.DeleteUser), Is.GreaterThan(0));
-        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(UserRepositoryOperationType.SaveChanges));
+        Assert.That(userRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
     }
 
     [Test]
@@ -132,7 +132,7 @@ public class UserServiceTest
     public void GetByIdSuccessTest()
     {
         var userService = CreateUserService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -144,7 +144,7 @@ public class UserServiceTest
 
         userService.GetUserById(1).Wait();
 
-        var operation = userRepository.Operations.Single(operation => operation.OperationType == UserRepositoryOperationType.GetById);
+        var operation = userRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.GetById);
         Assert.That((int)operation.Arguments.First(), Is.EqualTo(1));
     }
 
@@ -180,7 +180,7 @@ public class UserServiceTest
         ];
 
         foreach (var user in data)
-            userRepository.Users.Add(new UserModel()
+            userRepository.Models.Add(new UserModel()
             {
                 Id = user.Id,
                 FirstName = user.FirstName,

@@ -7,7 +7,7 @@ using FormsBackendCommon.Model;
 
 namespace FormsBackendBusiness.Services;
 
-public class UserService(IUserRepository userRepository,
+public class UserService(IGenericRepository<UserModel> userRepository,
     ITaskService taskService, IMapper mapper, UserCreateValidator userCreateValidator,
     UserUpdateValidator userUpdateValidator) : IUserService
 {
@@ -16,7 +16,7 @@ public class UserService(IUserRepository userRepository,
         var validationResult = await userCreateValidator.ValidateAsync(userCreate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        if ((await userRepository.GetAsync()).Any(user => user.Email == userCreate.Email))
+        if ((await userRepository.GetFilteredAsync([user => user.Email == userCreate.Email])).Count > 0)
             throw new ValidationFailedException([new ValidationError("Email validation failed", "User with this email already exists")]);
 
         var user = mapper.Map<UserModel>(userCreate);
@@ -31,7 +31,7 @@ public class UserService(IUserRepository userRepository,
 
     public async Task DeleteUserAsync(int id)
     {
-        var user = await userRepository.GetyByIdAsync(id) ??
+        var user = await userRepository.GetByIdAsync(id) ??
             throw new UserNotFoundException(id);
         await taskService.DeleteUserTasksAsync(id);
         await userRepository.DeleteAsync(user);
@@ -43,7 +43,7 @@ public class UserService(IUserRepository userRepository,
         var validationResult = await userUpdateValidator.ValidateAsync(userUpdate);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var user = await userRepository.GetyByIdAsync(userUpdate.Id) ??
+        var user = await userRepository.GetByIdAsync(userUpdate.Id) ??
             throw new UserNotFoundException(userUpdate.Id);
 
         user.Email = userUpdate.Email;
@@ -56,7 +56,7 @@ public class UserService(IUserRepository userRepository,
 
     public async Task<UserGet?> GetUserById(int id)
     {
-        var user = await userRepository.GetyByIdAsync(id) ??
+        var user = await userRepository.GetByIdAsync(id) ??
             throw new UserNotFoundException(id);
         return mapper.Map<UserGet>(user);
     }

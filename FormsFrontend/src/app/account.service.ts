@@ -18,7 +18,7 @@ export class AccountService {
   private httpClient = inject(HttpClient);
   private loggedInAccountId = signal<number | undefined>(undefined);
 
-  loggedInGuid = this.loggedInAccountId.asReadonly();
+  loggedInId = this.loggedInAccountId.asReadonly();
 
   registerAccount(firstName: string, lastName: string, email: string, password: string): Observable<ApiException> {
     return this.httpClient.post<ApiException>(apiRoute + '/register', {

@@ -4,7 +4,7 @@ import { ApiException } from "../../account.service";
 import { Observable, map, tap } from "rxjs";
 
 export type User = {
-  id: string,
+  id: number,
   firstName: string,
   lastName: string,
   email: string,
@@ -36,8 +36,8 @@ export class UserService {
     })).pipe(map(res => res.result));
   }
 
-  deleteUser(guid: string): Observable<Object> {
-    return this.httpClient.delete(apiRoute + `/delete/${guid}`, { withCredentials: true })
+  deleteUser(id: number): Observable<Object> {
+    return this.httpClient.delete(apiRoute + `/delete/${id}`, { withCredentials: true })
       .pipe(tap(res => {
         this.fetchUsers();
       }));

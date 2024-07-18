@@ -13,8 +13,8 @@ namespace FormBackendTest;
 public class TaskServiceTest
 {
     readonly Mapper mapper = (Mapper)DtoEntityMapperProfile.GetConfiguration().CreateMapper();
-    MockTaskRepository taskRepository = new();
-    MockUserRepository userRepository = new();
+    MockGenericRepository<TaskModel> taskRepository = new();
+    MockGenericRepository<UserModel> userRepository = new();
 
     TaskService CreateTaskService()
     {
@@ -31,7 +31,7 @@ public class TaskServiceTest
     public void CreateSuccessTest()
     {
         var taskService = CreateTaskService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -45,7 +45,7 @@ public class TaskServiceTest
 
         taskService.CreateTaskAsync(taskCreate).Wait();
 
-        var operation = taskRepository.Operations.Single(operation => operation.OperationType == TaskRepositoryOperationType.Insert);
+        var operation = taskRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Insert);
         var taskModel = (TaskModel)operation.Arguments.First();
 
         Assert.That(taskModel.Title, Is.EqualTo(taskCreate.Title));
@@ -57,8 +57,8 @@ public class TaskServiceTest
         Assert.That(taskModel.ModificationDate, Is.LessThan(taskModel.CreationDate.AddMilliseconds(100)));
         Assert.That(taskModel.ModificationDate, Is.GreaterThan(taskModel.CreationDate.AddMilliseconds(-100)));
 
-        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(TaskRepositoryOperationType.SaveChanges));
-        Assert.IsFalse(userRepository.Operations.Exists(operation => operation.OperationType == UserRepositoryOperationType.SaveChanges));
+        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
+        Assert.IsFalse(userRepository.Operations.Exists(operation => operation.OperationType == RepositoryOperationType.SaveChanges));
     }
 
     [Test]
@@ -76,7 +76,7 @@ public class TaskServiceTest
     public void UpdateSuccessTest()
     {
         var taskService = CreateTaskService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -86,11 +86,11 @@ public class TaskServiceTest
             }
         ];
         var dt = DateTime.Now;
-        taskRepository.Tasks = [
+        taskRepository.Models = [
             new TaskModel()
             {
                 Id = 1,
-                User = userRepository.Users[0],
+                User = userRepository.Models[0],
                 Title = "testing",
                 Description = "testing update method",
                 DueDate = dt.AddDays(1),
@@ -103,7 +103,7 @@ public class TaskServiceTest
         var taskUpdate = new TaskUpdate(1, "testing", "done testing update method", dt2);
         taskService.UpdateTaskAsync(taskUpdate).Wait();
 
-        var operation = taskRepository.Operations.Single(operation => operation.OperationType == TaskRepositoryOperationType.Update);
+        var operation = taskRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Update);
         var taskModel = (TaskModel)operation.Arguments.First();
 
         Assert.That(taskModel.Id, Is.EqualTo(1));
@@ -115,7 +115,7 @@ public class TaskServiceTest
         Assert.That(taskModel.ModificationDate, Is.LessThan(DateTime.Now.AddMilliseconds(100)));
         Assert.That(taskModel.ModificationDate, Is.GreaterThan(DateTime.Now.AddMilliseconds(-100)));
 
-        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(TaskRepositoryOperationType.SaveChanges));
+        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
     }
 
     [Test]
@@ -134,7 +134,7 @@ public class TaskServiceTest
     public void DeleteSuccessTest()
     {
         var taskService = CreateTaskService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -144,11 +144,11 @@ public class TaskServiceTest
             }
         ];
         var dt = DateTime.Now;
-        taskRepository.Tasks = [
+        taskRepository.Models = [
             new TaskModel()
             {
                 Id = 1,
-                User = userRepository.Users[0],
+                User = userRepository.Models[0],
                 Title = "testing",
                 Description = "testing update method",
                 DueDate = dt.AddDays(1),
@@ -159,11 +159,11 @@ public class TaskServiceTest
 
         taskService.DeleteTaskAsync(1).Wait();
 
-        var operation = taskRepository.Operations.Single(operation => operation.OperationType == TaskRepositoryOperationType.Delete);
+        var operation = taskRepository.Operations.Single(operation => operation.OperationType == RepositoryOperationType.Delete);
         var taskModel = (TaskModel)operation.Arguments.First();
 
         Assert.That(taskModel.Id, Is.EqualTo(1));
-        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(TaskRepositoryOperationType.SaveChanges));
+        Assert.That(taskRepository.Operations.Last().OperationType, Is.EqualTo(RepositoryOperationType.SaveChanges));
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class TaskServiceTest
         var dt2 = DateTime.Now.AddDays(1);
 
         var taskService = CreateTaskService();
-        userRepository.Users = [
+        userRepository.Models = [
             new UserModel()
             {
                 Id = 1,
@@ -200,11 +200,11 @@ public class TaskServiceTest
                 Email = "adamnowak@gmail.com",
             }
         ];
-        taskRepository.Tasks = [
+        taskRepository.Models = [
             new TaskModel()
             {
                 Id = 1,
-                User = userRepository.Users[0],
+                User = userRepository.Models[0],
                 Title = "testing",
                 Description = "testing get",
                 DueDate = dt2,
@@ -214,7 +214,7 @@ public class TaskServiceTest
             new TaskModel()
             {
                 Id = 2,
-                User = userRepository.Users[1],
+                User = userRepository.Models[1],
                 Title = "testing",
                 Description = "testing get 2",
                 DueDate = dt2,
