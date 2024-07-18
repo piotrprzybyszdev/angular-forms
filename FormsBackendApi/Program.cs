@@ -10,7 +10,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseSqlite("FileName=forms.db", b => b.MigrationsAssembly("FormsBackendApi")));
 
 builder.Services.AddSingleton(DtoEntityMapperProfile.GetConfiguration().CreateMapper());
-
+builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 CookieConfiguration.Configure(builder.Services);
 ServiceConfiguration.Configure(builder.Services);
 

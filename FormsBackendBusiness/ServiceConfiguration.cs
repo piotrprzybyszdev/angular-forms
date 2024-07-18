@@ -1,5 +1,7 @@
-﻿using FormsBackendBusiness.Services;
-using FormsBackendBusiness.Validation;
+﻿using FormsBackendBusiness.Tasks.Commands.AddTask;
+using FormsBackendBusiness.Tasks.Commands.UpdateTask;
+using FormsBackendBusiness.Users.Commands.AddUser;
+using FormsBackendBusiness.Users.Commands.UpdateUser;
 using FormsBackendCommon.Interface;
 using FormsBackendCommon.Model;
 using FormsBackendInfrastructure;
@@ -14,14 +16,9 @@ public static class ServiceConfiguration
         services.AddScoped<IGenericRepository<UserModel>, GenericRepository<UserModel>>();
         services.AddScoped<IGenericRepository<TaskModel>, GenericRepository<TaskModel>>();
 
-        services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<ITaskService, TaskService>();
-
-        services.AddScoped<AccountRegisterValidator>();
-        services.AddScoped<UserCreateValidator>();
-        services.AddScoped<UserUpdateValidator>();
-        services.AddScoped<TaskCreateValidator>();
-        services.AddScoped<TaskUpdateValidator>();
+        services.AddScoped<AddUserRequestValidator>();
+        services.AddScoped<UpdateUserRequestValidator>();
+        services.AddScoped<AddTaskRequestValidator>();
+        services.AddScoped<UpdateTaskRequestValidator>();
     }
 }

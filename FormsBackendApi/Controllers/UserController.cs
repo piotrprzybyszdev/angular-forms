@@ -1,5 +1,8 @@
-﻿using FormsBackendCommon.Dtos.User;
-using FormsBackendCommon.Interface;
+﻿using FormsBackendBusiness.Users.Commands.AddUser;
+using FormsBackendBusiness.Users.Commands.DeleteUser;
+using FormsBackendBusiness.Users.Queries.GetUsers;
+using FormsBackendBusiness.Users.Commands.UpdateUser;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -10,37 +13,36 @@ namespace FormsBackendApi.Controllers;
 [Authorize]
 [Route("/user")]
 [ApiController]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpPost("create")]
-    public async Task<IActionResult> CreateUserAsync([FromBody] UserCreate userCreate)
+    public async Task<IActionResult> CreateUserAsync([FromBody] AddUserCommand addUserCommand)
     {
-        return Ok(await userService.CreateUserAsync(userCreate));
+        return Ok(await mediator.Send(addUserCommand));
     }
 
     [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteUserAsync(int id)
     {
-        await userService.DeleteUserAsync(id);
-        return Ok();
+        return Ok(await mediator.Send(
+            new DeleteUserCommand()
+            {
+                Id = id
+            })
+        );
     }
 
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdate userUpdate)
+    public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserCommand updateUserCommand)
     {
-        await userService.UpdateUserAsync(userUpdate);
-        return Ok();
-    }
-
-    [HttpGet("get/{id}")]
-    public async Task<IActionResult> GetUserAsync(int id)
-    {
-        return Ok(await userService.GetUserById(id));
+        return Ok(await mediator.Send(updateUserCommand));
     }
 
     [HttpGet("get")]
     public async Task<IActionResult> GetUsersAsync()
     {
-        return Ok(await userService.GetUsersAsync());
+        return Ok((await mediator.Send(
+            new GetUsersQuery()
+        )).Users);
     }
 }

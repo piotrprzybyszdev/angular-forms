@@ -29,12 +29,12 @@ export class AccountService {
     });
   }
 
-  logIn(email: string, password: string): Observable<{ id?: number }> {
-    return this.httpClient.post<{id?: number}>(apiRoute + '/login', {
+  logIn(email: string, password: string): Observable<number> {
+    return this.httpClient.post<number>(apiRoute + '/login', {
       email: email,
       password: password
     }).pipe(tap({
-      next: res => this.loggedInAccountId.set(res.id)
+      next: res => this.loggedInAccountId.set(res)
     }));
   }
 

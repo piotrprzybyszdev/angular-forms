@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
-using FormsBackendCommon.Dtos.Account;
-using FormsBackendCommon.Dtos.Task;
-using FormsBackendCommon.Dtos.User;
+using FormsBackendBusiness.Tasks.Commands.AddTask;
+using FormsBackendBusiness.Tasks.Commands.UpdateTask;
+using FormsBackendBusiness.Tasks.Queries.GetUserTasks;
+using FormsBackendBusiness.Users.Commands.AddUser;
+using FormsBackendBusiness.Users.Commands.UpdateUser;
+using FormsBackendBusiness.Users.Queries.GetUsers;
 using FormsBackendCommon.Model;
 
 namespace FormsBackendBusiness;
@@ -17,14 +20,13 @@ public class DtoEntityMapperProfile : Profile
     {
         return new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<AccountRegister, UserModel>();
-            cfg.CreateMap<UserCreate, UserModel>()
+            cfg.CreateMap<AddUserCommand, UserModel>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            cfg.CreateMap<UserUpdate, UserModel>();
+            cfg.CreateMap<UpdateUserCommand, UserModel>();
             cfg.CreateMap<UserModel, UserGet>();
-            cfg.CreateMap<TaskCreate, TaskModel>()
+            cfg.CreateMap<AddTaskCommand, TaskModel>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
-            cfg.CreateMap<TaskUpdate, TaskModel>();
+            cfg.CreateMap<UpdateTaskCommand, TaskModel>();
             cfg.CreateMap<TaskModel, TaskGet>(); 
         });
     }

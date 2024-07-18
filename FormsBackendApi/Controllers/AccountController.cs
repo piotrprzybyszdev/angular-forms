@@ -1,5 +1,6 @@
-using FormsBackendCommon.Dtos.Account;
-using FormsBackendCommon.Interface;
+using FormsBackendBusiness.Users.Commands.AddUser;
+using FormsBackendBusiness.Users.Commands.LogInUser;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +10,18 @@ namespace FormsBackendApi.Controllers;
 
 [Route("/")]
 [ApiController]
-public class AccountController(IAccountService accountService) : ControllerBase
+public class AccountController(IMediator mediator) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromBody] AccountRegister accountRegister)
+    public async Task<IActionResult> RegisterAsync([FromBody] AddUserCommand addUserCommand)
     {
-        await accountService.RegisterAsync(accountRegister);
-        return Ok();
+        return Ok(await mediator.Send(addUserCommand));
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromBody] AccountLogIn accountLogIn)
+    public async Task<IActionResult> LoginAsync([FromBody] ValidateLogInCommand logInCommand)
     {
-        var user = await accountService.LogInAsync(accountLogIn);
+        var user = (await mediator.Send(logInCommand)).User;
 
         var claims = new List<Claim>()
         {
@@ -37,13 +37,12 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties());
-        return Ok(new AccountLogInResponse(user.Id));
+        return Ok(user.Id);
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> LogoutAsync()
     {
-        await accountService.LogOutAsync();
         await HttpContext.SignOutAsync();
         return Ok();
     }

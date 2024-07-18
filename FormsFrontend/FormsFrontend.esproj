@@ -6,5 +6,12 @@
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\FormsFrontend\browser\</BuildOutputFolder>
+    <BuildCommand>
+    </BuildCommand>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include=".vscode\extensions.json" />
+    <None Include=".vscode\launch.json" />
+    <None Include=".vscode\tasks.json" />
+  </ItemGroup>
 </Project>
