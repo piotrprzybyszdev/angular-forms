@@ -1,21 +1,26 @@
-﻿using FormsBackendBusiness.Exceptions;
-using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+﻿using Dapper;
+using FormsBackendBusiness.Exceptions;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Tasks.Commands.DeleteTask;
 
-public class DeleteTaskCommandHandler(IGenericRepository<TaskModel> taskRepository)
+public class DeleteTaskCommandHandler(ApplicationDbContext dbContext)
     : IRequestHandler<DeleteTaskCommand, DeleteTaskCommandResult>
 {
     public async Task<DeleteTaskCommandResult> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
     {
-        var task = await taskRepository.GetByIdAsync(request.Id) ??
-            throw new TaskNotFoundException(request.Id);
-
-        await taskRepository.DeleteAsync(task);
-        await taskRepository.SaveChangesAsync();
-
+        await DeleteTask(request.Id);
         return new DeleteTaskCommandResult();
+    }
+
+    public async Task DeleteTask(int Id)
+    {
+        var sql = @"
+DELETE FROM Tasks WHERE Id = @Id;";
+
+        var rowsAffected = await dbContext.Connection.ExecuteAsync(sql, new { Id });
+        if (rowsAffected == 0)
+            throw new TaskNotFoundException(Id);
     }
 }

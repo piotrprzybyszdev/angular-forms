@@ -1,6 +1,12 @@
 ﻿namespace FormsBackendBusiness.Users.Queries.GetUsers;
 
-public record UserGet(int Id, string FirstName, string LastName, string Email);
+public class UserGet
+{
+    public int Id { get; init; }
+    public string FirstName { get; init; } = default!;
+    public string LastName { get; init; } = default!;
+    public string Email { get; init; } = default!;
+}
 
 public class GetUsersQueryResult
 {

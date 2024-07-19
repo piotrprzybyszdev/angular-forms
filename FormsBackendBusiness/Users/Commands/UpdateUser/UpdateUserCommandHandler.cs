@@ -1,11 +1,11 @@
-﻿using FormsBackendBusiness.Exceptions;
-using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+﻿using Dapper;
+using FormsBackendBusiness.Exceptions;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler(IGenericRepository<UserModel> userRepository,
+public class UpdateUserCommandHandler(ApplicationDbContext dbContext,
     UpdateUserRequestValidator updateUserRequestValidator)
     : IRequestHandler<UpdateUserCommand, UpdateUserCommandResult>
 {
@@ -14,15 +14,20 @@ public class UpdateUserCommandHandler(IGenericRepository<UserModel> userReposito
         var validationResult = await updateUserRequestValidator.ValidateAsync(request);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var user = await userRepository.GetByIdAsync(request.Id) ??
-            throw new UserNotFoundException(request.Id);
+        await UpdateUser(request.Id, request.FirstName, request.LastName, request.Email);
 
-        user.Email = request.Email;
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-
-        await userRepository.UpdateAsync(user);
-        await userRepository.SaveChangesAsync();
         return new UpdateUserCommandResult();
+    }
+
+    public async Task UpdateUser(int Id, string FirstName, string LastName, string Email)
+    {
+        var sql = @"
+UPDATE Users SET
+FirstName=@FirstName, LastName=@LastName, Email=@Email
+WHERE Id=@Id";
+
+        int affectedRows = await dbContext.Connection.ExecuteAsync(sql, new { Id, FirstName, LastName, Email });
+        if (affectedRows == 0)
+            throw new UserNotFoundException(Id);
     }
 }

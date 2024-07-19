@@ -1,15 +1,22 @@
-﻿using AutoMapper;
-using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+﻿using Dapper;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Users.Queries.GetUsers;
 
-public class GetUsersQueryHandler(IGenericRepository<UserModel> userRepository, IMapper mapper)
+public class GetUsersQueryHandler(ApplicationDbContext dbContext)
     : IRequestHandler<GetUsersQuery, GetUsersQueryResult>
 {
     public async Task<GetUsersQueryResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        return new GetUsersQueryResult() { Users = mapper.Map<List<UserGet>>(await userRepository.GetAsync()) };
+        return new GetUsersQueryResult() { 
+            Users = await GetUsers()
+        };
+    }
+
+    public async Task<List<UserGet>> GetUsers()
+    {
+        var sql = "SELECT Id, FirstName, LastName, Email FROM Users";
+        return (await dbContext.Connection.QueryAsync<UserGet>(sql)).ToList();
     }
 }

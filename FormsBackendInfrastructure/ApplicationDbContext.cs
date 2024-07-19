@@ -1,29 +1,13 @@
-﻿using FormsBackendCommon.Model;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
 
 namespace FormsBackendInfrastructure;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext
 {
-    public DbSet<UserModel> Users { get; set; }
-    public DbSet<TaskModel> Tasks { get; set; }
+    public SqliteConnection Connection { get; } = new SqliteConnection("FileName=forms.db");
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
+    public ApplicationDbContext()
     {
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-    }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.Entity<TaskModel>().HasKey(e => e.Id);
-
-        builder.Entity<TaskModel>().HasOne(e => e.User);
-
-        base.OnModelCreating(builder);
+        Connection.Open();
     }
 }

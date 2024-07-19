@@ -1,29 +1,45 @@
-﻿using AutoMapper;
+﻿using Dapper;
 using FormsBackendBusiness.Exceptions;
-using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Users.Commands.AddUser;
 
 public class AddUserCommandHandler(AddUserRequestValidator addUserRequestValidator,
-    IGenericRepository<UserModel> userRepository, IMapper mapper)
-    : IRequestHandler<AddUserCommand, AddUserCommandResult>
+    ApplicationDbContext dbContext) : IRequestHandler<AddUserCommand, AddUserCommandResult>
 {
     public async Task<AddUserCommandResult> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
         var validationResult = await addUserRequestValidator.ValidateAsync(request);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        if ((await userRepository.GetFilteredAsync([user => user.Email == request.Email])).Count > 0)
-            throw new ValidationFailedException([new ValidationError("Email validation failed", "User with this email already exists")]);
-        var user = mapper.Map<UserModel>(request);
+        await CheckEmailExists(request.Email);
 
-        user.PasswordSalt = BCrypt.Net.BCrypt.GenerateSalt();
-        user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password, user.PasswordSalt);
+        var salt = BCrypt.Net.BCrypt.GenerateSalt();
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password, salt);
 
-        var id = await userRepository.InsertAsync(user);
-        await userRepository.SaveChangesAsync();
+        var id = await InsertUser(request.FirstName, request.LastName, request.Email, hashedPassword, salt);
         return new AddUserCommandResult() { UserId = id };
+    }
+
+    public async Task CheckEmailExists(string Email)
+    {
+        string sql = @"
+SELECT Id FROM Users
+WHERE Email = @Email";
+
+        var id = await dbContext.Connection.QuerySingleOrDefaultAsync<int?>(sql, new { Email });
+        if (id != null)
+            throw new ValidationFailedException([new ValidationError("Email validation failed", "User with this email already exists")]);
+    }
+
+    public async Task<int> InsertUser(string FirstName, string LastName, string Email, string HashedPassword, string PasswordSalt)
+    {
+        string sql = @"
+INSERT INTO Users (FirstName, LastName, Email, HashedPassword, PasswordSalt)
+VALUES (@FirstName, @LastName, @Email, @HashedPassword, @PasswordSalt);
+SELECT last_insert_rowid()";
+
+        return await dbContext.Connection.QuerySingleOrDefaultAsync<int>(sql, new { FirstName, LastName, Email, HashedPassword, PasswordSalt });
     }
 }

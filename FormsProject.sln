@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormsBackendBusiness", "For
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "FormsFrontend", "FormsFrontend\FormsFrontend.esproj", "{D55C8620-F212-4970-9899-02277F30F8DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBackendTest", "FormsBackendTest\FormsBackendTest.csproj", "{C82F53EC-0048-4C9B-A236-8012D1E64EB3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{D55C8620-F212-4970-9899-02277F30F8DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D55C8620-F212-4970-9899-02277F30F8DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D55C8620-F212-4970-9899-02277F30F8DF}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{C82F53EC-0048-4C9B-A236-8012D1E64EB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C82F53EC-0048-4C9B-A236-8012D1E64EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C82F53EC-0048-4C9B-A236-8012D1E64EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C82F53EC-0048-4C9B-A236-8012D1E64EB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

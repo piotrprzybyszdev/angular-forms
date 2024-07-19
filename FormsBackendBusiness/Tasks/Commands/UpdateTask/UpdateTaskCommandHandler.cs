@@ -1,12 +1,12 @@
-﻿using FormsBackendBusiness.Exceptions;
-using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+﻿using Dapper;
+using FormsBackendBusiness.Exceptions;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Tasks.Commands.UpdateTask;
 
 public class UpdateTaskCommandHandler(UpdateTaskRequestValidator updateTaskRequestValidator,
-    IGenericRepository<TaskModel> taskRepository)
+    ApplicationDbContext dbContext)
     : IRequestHandler<UpdateTaskCommand, UpdateTaskCommandResult>
 {
     public async Task<UpdateTaskCommandResult> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
@@ -14,17 +14,20 @@ public class UpdateTaskCommandHandler(UpdateTaskRequestValidator updateTaskReque
         var validationResult = await updateTaskRequestValidator.ValidateAsync(request);
         if (!validationResult.IsValid) throw new ValidationFailedException(validationResult.Errors);
 
-        var task = await taskRepository.GetByIdAsync(request.Id) ??
-            throw new TaskNotFoundException(request.Id);
-
-        task.Title = request.Title;
-        task.Description = request.Description;
-        task.DueDate = request.DueDate;
-        task.ModificationDate = DateTime.Now;
-
-        await taskRepository.UpdateAsync(task);
-        await taskRepository.SaveChangesAsync();
+        await UpdateTask(request.Id, request.Title, request.Description, request.DueDate, DateTime.Now);
 
         return new UpdateTaskCommandResult();
+    }
+
+    public async Task UpdateTask(int Id, string Title, string Description, DateTime DueDate, DateTime ModificationDate)
+    {
+        string sql = @"
+UPDATE Tasks SET
+Title=@Title, Description=@Description, ModificationDate=@ModificationDate, DueDate=@DueDate
+WHERE Id=@Id;";
+
+        int affectedRows = await dbContext.Connection.ExecuteAsync(sql, new { Id, Title, Description, DueDate, ModificationDate });
+        if (affectedRows == 0)
+            throw new TaskNotFoundException(Id);
     }
 }

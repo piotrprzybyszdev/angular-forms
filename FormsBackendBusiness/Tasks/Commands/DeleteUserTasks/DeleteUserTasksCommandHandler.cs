@@ -1,21 +1,23 @@
-﻿using FormsBackendCommon.Interface;
-using FormsBackendCommon.Model;
+﻿using Dapper;
+using FormsBackendInfrastructure;
 using MediatR;
 
 namespace FormsBackendBusiness.Tasks.Commands.DeleteUserTasks;
 
-public class DeleteUserTasksCommandHandler(IGenericRepository<TaskModel> taskRepository)
+public class DeleteUserTasksCommandHandler(ApplicationDbContext dbContext)
     : IRequestHandler<DeleteUserTasksCommand, DeleteUserTasksCommandResult>
 {
     public async Task<DeleteUserTasksCommandResult> Handle(DeleteUserTasksCommand request, CancellationToken cancellationToken)
     {
-        var tasks = await taskRepository.GetFilteredAsync(
-            [task => task.User.Id == request.UserId]
-        );
-
-        foreach (var task in tasks)
-            await taskRepository.DeleteAsync(task);
-
+        await DeleteUserTasks(request.UserId);
         return new DeleteUserTasksCommandResult();
+    }
+
+    public async Task DeleteUserTasks(int UserId)
+    {
+        string sql = @"
+DELETE FROM Tasks WHERE UserId = @UserId;";
+
+        await dbContext.Connection.ExecuteAsync(sql, new { UserId });
     }
 }
